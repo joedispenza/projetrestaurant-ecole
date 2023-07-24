@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Commande extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        
+        'is_deliver',
+        'price'
+    ];
+    protected $casts = [
+        'is_deliver' => 'boolean'
+    ];
+    protected $hidden = [
+        'updated_at'
+    ];
 }

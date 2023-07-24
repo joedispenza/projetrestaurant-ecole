@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('commandes', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->boolean('is_deliver');
+            $table->boolean('is_deliver')->default(false);
+            $table->float('price');
         });
     }
 

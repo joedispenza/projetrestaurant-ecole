@@ -9,6 +9,9 @@ use App\Models\Repas;
 use Illuminate\Http\Request; 
 use Spatie\QueryBuilder\QueryBuilder;
 
+
+
+
 class RepasController extends Controller
 {
     public function index(Request $request) {
@@ -42,5 +45,4 @@ class RepasController extends Controller
        $repa->delete();
         return response() -> noContent();
     }
-
 }
