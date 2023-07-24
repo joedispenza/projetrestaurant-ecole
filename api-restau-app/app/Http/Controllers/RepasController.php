@@ -7,11 +7,18 @@ use App\Http\Requests\StoreRepasRequest;
 use App\Http\Requests\UpdateRepasRequest;
 use App\Models\Repas;
 use Illuminate\Http\Request; 
+use Spatie\QueryBuilder\QueryBuilder;
 
 class RepasController extends Controller
 {
     public function index(Request $request) {
-        return new RepasCollection(Repas::paginate());
+        
+        $repas = QueryBuilder::for(Repas::class)
+        ->allowedFilters('is_available')
+        ->defaultSort('-created_at')
+        ->paginate();
+        
+        return new RepasCollection($repas);
     }
     public function show(Request  $request, Repas $repa ) {
         // echo($repa);
