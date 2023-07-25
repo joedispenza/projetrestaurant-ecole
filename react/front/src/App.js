@@ -1,17 +1,49 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import axios from "axios";
 const address = "http://127.0.0.1:8000/api/";
 function App() {
   const [hiddenModal, setHiddenModal] = useState("modal hidden");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("isLoggedIn") === "true"
+  );
+  const [username, setUsername] = useState(
+    localStorage.getItem("username") || ""
+  );
   return (
     <div className="container">
-      <Header setHiddenModal={setHiddenModal} />
-      <Connexion hiddenModal={hiddenModal} setHiddenModal={setHiddenModal} />
+      <Header
+        setHiddenModal={setHiddenModal}
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        username={username}
+        setUsername={setUsername}
+      />
+      <Connexion
+        hiddenModal={hiddenModal}
+        setHiddenModal={setHiddenModal}
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        username={username}
+        setUsername={setUsername}
+      />
       <LesRepas />
     </div>
   );
 }
-function Header({ setHiddenModal }) {
+function Header({
+  setHiddenModal,
+  isLoggedIn,
+  setIsLoggedIn,
+  username,
+  setUsername,
+}) {
+  function handleLogOut() {
+    setIsLoggedIn(false);
+    setUsername("");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("username");
+  }
   return (
     <header className="header">
       <img src="./../img/logo192.png" alt="Logo" className="header__logo" />
@@ -28,7 +60,14 @@ function Header({ setHiddenModal }) {
           <span>Search</span>
         </button>
       </form>
-
+      {isLoggedIn ? (
+        <button className="btn--small" onClick={() => handleLogOut()}>
+          {" "}
+          {username} Se deconnecter
+        </button>
+      ) : (
+        <span></span>
+      )}
       <nav className="nav">
         <ul className="nav__list">
           <li className="nav__item">
@@ -128,7 +167,14 @@ function LesRepas() {
     </div>
   );
 }
-function Connexion({ hiddenModal, setHiddenModal }) {
+function Connexion({
+  hiddenModal,
+  setHiddenModal,
+  isLoggedIn,
+  setIsLoggedIn,
+  userName,
+  setUsername,
+}) {
   const [loginForm, setLoginForm] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -137,6 +183,72 @@ function Connexion({ hiddenModal, setHiddenModal }) {
   function handleSubmit(e) {
     e.preventDefault();
   }
+  function sendConnexion() {
+    // Replace 'your_api_endpoint' with the actual endpoint for login
+    const loginEndpoint = `${address}login`;
+
+    // Data to be sent in the POST request body
+    const userData = {
+      email: email,
+      password: password,
+    };
+
+    axios
+      .post(loginEndpoint, userData)
+      .then((response) => {
+        // Assuming the API returns a token in the response
+        const token = response.data.acces_token;
+
+        // Store the token in the local storage or any other state management
+        localStorage.setItem("token", token);
+
+        // Now you can use the token for subsequent API requests
+        // You can set the token in the request header using axios defaults
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        // Perform any other action after successful login
+
+        localStorage.setItem("isLoggedIn", "true");
+
+        localStorage.setItem("username", response.data.name);
+        setUsername(response.data.name);
+        setIsLoggedIn(true);
+
+        console.log("Connexion successful ");
+        console.log(response.data.name);
+        console.log(token);
+      })
+      .catch((error) => {
+        // Handle error during login
+        console.log("Connexion failed");
+      });
+  }
+  const handleRegistration = () => {
+    // Replace 'your_api_endpoint' with the actual endpoint for registration
+    const registrationEndpoint = `${address}register`;
+
+    // Data to be sent in the POST request body
+    const userData = {
+      name: name,
+      email: email,
+      password: password,
+      password_confirmation: passwordConfirm,
+      // Add other fields as needed for registration
+    };
+
+    // Call the registration endpoint using axios
+    axios
+      .post(registrationEndpoint, userData)
+      .then((response) => {
+        // Handle successful registration, e.g., show a success message or redirect to login page
+        console.log("Registration successful!", response.data);
+      })
+      .catch((error) => {
+        // Handle error during registration, e.g., display error message to the user
+        console.error("Registration failed:", error.response.data);
+      });
+  };
+
   return (
     <div className={hiddenModal}>
       <button
@@ -179,7 +291,9 @@ function Connexion({ hiddenModal, setHiddenModal }) {
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
             />
-            <button className="btn">Continuer &rarr;</button>
+            <button className="btn" onClick={() => handleRegistration()}>
+              Continuer &rarr;
+            </button>
           </form>
         </>
       ) : (
@@ -201,11 +315,19 @@ function Connexion({ hiddenModal, setHiddenModal }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="btn">Continuer &rarr;</button>
+            <button
+              className="btn"
+              onClick={() => {
+                sendConnexion();
+              }}
+            >
+              Continuer &rarr;
+            </button>
           </form>
         </>
       )}
     </div>
   );
 }
+
 export default App;
