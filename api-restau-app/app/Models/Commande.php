@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+
 
 class Commande extends Model
 {
@@ -16,7 +19,10 @@ class Commande extends Model
     protected $casts = [
         'is_deliver' => 'boolean'
     ];
-    protected $hidden = [
-        'updated_at'
-    ];
+    // protected $hidden = [
+    //     'updated_at'
+    // ];
+    public function creator(): BelongsTo {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
 }

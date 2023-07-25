@@ -17,7 +17,8 @@ class Repas extends Model
     protected $casts = [
         'is_available' => 'boolean'
     ];
-    protected $hidden = [
-        'updated_at'
-    ];
+    // protected $hidden = [
+    //     'updated_at'
+    // ];
+   
 }
