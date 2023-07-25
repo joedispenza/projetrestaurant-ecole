@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCommandeRequest;
 use App\Models\Commande;
 use Illuminate\Http\Request; 
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Support\Facades\Auth;
 // use Illuminate\Http\Request;
 
 class CommandeController extends Controller
@@ -28,7 +29,7 @@ class CommandeController extends Controller
     public function store(StoreCommandeRequest  $request ) {
         $validated = $request->validated();
         // echo $validated;
-        $commande = Commande::create($validated);
+        $commande = Auth::user()->commandes()->create($validated);
         return new CommandeResource($commande); 
     }
     
