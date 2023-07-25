@@ -19,7 +19,7 @@ class RepasController extends Controller
         $repas = QueryBuilder::for(Repas::class)
         ->allowedFilters('is_available')
         ->defaultSort('-created_at')
-        ->paginate();
+        ->paginate(6);
         
         return new RepasCollection($repas);
     }
